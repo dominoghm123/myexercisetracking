@@ -10,7 +10,7 @@ const navItems = [
   { label: 'Today Record', icon: 'today', active: true },
   { label: 'Dashboard', icon: 'dashboard' },
   { label: 'Plan', icon: 'plan' },
-  { label: 'Review', icon: 'review', badge: '3' },
+  { label: 'Review', icon: 'review', badge: String(dailyRecordViewModel.summary.reviewCount) },
   { label: 'Settings', icon: 'settings' },
 ];
 
@@ -18,6 +18,8 @@ const icon = (name) => `
   <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
     ${icons[name]}
   </svg>`;
+
+const todayRecord = mapDailyRecordViewModel(dailyRecordViewModel);
 
 document.querySelector('#app').innerHTML = `
   <div class="app-shell">
@@ -32,7 +34,7 @@ document.querySelector('#app').innerHTML = `
       <div class="sidebar-caption">DAILY PRACTICE</div>
       <nav class="nav-list">
         ${navItems.map((item) => `
-          <button class="nav-item${item.active ? ' is-active' : ''}" type="button" aria-current="${item.active ? 'page' : 'false'}" title="${item.label}">
+          <button class="nav-item${item.active ? ' is-active' : ''}" type="button" ${item.active ? 'aria-current="page"' : ''} data-nav="${item.label}" title="${item.label}">
             <span class="nav-icon">${icon(item.icon)}</span>
             <span class="nav-label">${item.label}</span>
             ${item.badge ? `<span class="nav-badge" aria-label="${item.badge} items to review">${item.badge}</span>` : ''}
@@ -50,17 +52,49 @@ document.querySelector('#app').innerHTML = `
       </div>
     </aside>
 
-    <main class="review-stage">
-      <div class="review-note">
-        <span class="eyebrow">UI REVIEW · UNIT 01</span>
-        <h1>Today begins<br/>with a clear page.</h1>
-        <p>This canvas intentionally holds no daily-record UI yet. Review the sidebar, type scale, spacing and provisional sage accent first.</p>
-        <div class="review-key">
-          <span><i class="swatch warm"></i>Warm white</span>
-          <span><i class="swatch sage"></i>Sage</span>
-          <span><i class="swatch ink"></i>Soft ink</span>
-        </div>
-      </div>
-      <div class="stage-mark" aria-hidden="true">01</div>
-    </main>
+    <div class="app-content">
+      ${renderTodayRecord(todayRecord)}
+      <div class="app-toast" role="status" aria-live="polite" hidden></div>
+    </div>
   </div>`;
+
+const toast = document.querySelector('.app-toast');
+let toastTimer;
+
+function showToast(message) {
+  window.clearTimeout(toastTimer);
+  toast.textContent = message;
+  toast.hidden = false;
+  toastTimer = window.setTimeout(() => {
+    toast.hidden = true;
+  }, 3200);
+}
+
+document.addEventListener('click', (event) => {
+  const nav = event.target.closest('[data-nav]');
+  if (nav && !nav.matches('[aria-current="page"]')) {
+    showToast(`${nav.dataset.nav} is planned after MVP 0.1. Today Record remains your local source view.`);
+    return;
+  }
+
+  const action = event.target.closest('[data-action]');
+  if (!action) return;
+
+  if (action.dataset.action.startsWith('capture-')) {
+    const kind = action.dataset.action.replace('capture-', '').replace('-', ' ');
+    showToast(`Capture ${kind} is staged for the real-data intake slice. This 0.1 preview stays fixture-only.`);
+    return;
+  }
+
+  if (action.dataset.action === 'review') {
+    showToast('Review is visible but read-only in 0.1; synthetic fixture status was not changed.');
+    return;
+  }
+
+  if (action.dataset.action === 'view-all-records') {
+    showToast('All five fixture records are already shown in Today\'s Trail.');
+  }
+});
+import { dailyRecordViewModel } from './domain/daily-record-view-model.js';
+import { mapDailyRecordViewModel } from './features/today-record/map-daily-record-view.js';
+import { renderTodayRecord } from './features/today-record/render-today-record.js';

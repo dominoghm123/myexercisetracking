@@ -5,6 +5,6 @@
   "type": "module",
   "scripts": {
     "start": "node scripts/serve.mjs",
-    "check": "node --check src/app.js && node --check scripts/serve.mjs"
+    "check": "node --check src/app.js && node --check scripts/serve.mjs && node scripts/validate-fixtures.mjs && node scripts/validate-boundaries.mjs"
   }
 }
