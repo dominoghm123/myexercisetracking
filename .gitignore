@@ -1,0 +1,28 @@
+node_modules/
+.DS_Store
+.playwright-cli/
+
+# Authoritative local health data and immutable source evidence
+data/database/*
+data/images/*
+data/imports/*
+!data/database/.gitkeep
+!data/images/.gitkeep
+!data/imports/.gitkeep
+
+# Regenerable and local-only outputs
+cache/*
+backups/*
+notes/*
+!cache/.gitkeep
+!backups/.gitkeep
+!notes/.gitkeep
+
+# Local configuration and secrets
+.env
+.env.*
+config/local.*
+
+# Browser evidence
+output/playwright/*
+!output/playwright/.gitkeep
