@@ -94,9 +94,9 @@ export function mapDailyRecordViewModel(record) {
     intro: 'Movement, meals and recovery in one quiet daily view. Uncertain details stay visible until you review them.',
     fixtureLabel: record.fixtureLabel,
     captureActions: [
-      { key: 'workout', label: 'Log a workout' },
-      { key: 'meal', label: 'Add a meal photo' },
-      { key: 'health', label: 'Daily health' },
+      { key: 'workout', label: 'Log a workout', voiceContext: 'workout_summary' },
+      { key: 'meal', label: 'Add a meal photo', voiceContext: 'meal_note' },
+      { key: 'health', label: 'Daily health', voiceContext: 'daily_health_note' },
     ],
     reviewQueue: queue,
     coverageLabel: '5 fixture records · 1 unknown field',

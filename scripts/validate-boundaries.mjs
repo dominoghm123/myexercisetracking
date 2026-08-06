@@ -10,6 +10,7 @@ const projectRoot = path.resolve(scriptDirectory, "..");
 const protectedDirectories = [
   "data/database",
   "data/images",
+  "data/audio",
   "data/imports",
   "cache",
   "notes",

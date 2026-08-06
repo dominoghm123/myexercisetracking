@@ -4,19 +4,23 @@ Use this checklist for the review build. MVP 0.1 is a local, fixture-only previe
 
 ## Automated gates
 
-- [ ] Run `node scripts/validate-boundaries.mjs`; it exits `0` and reports that all five protected directories contain only empty `.gitkeep` placeholders.
+- [ ] Run `node scripts/validate-boundaries.mjs`; it exits `0` and reports that all protected directories contain only empty `.gitkeep` placeholders, including the deferred `data/audio/` boundary.
 - [ ] Start the app using the documented local command and confirm the local URL responds successfully.
 - [ ] Confirm the browser console contains **0 errors and 0 warnings** after a clean reload.
 - [ ] Confirm no request is made to an external host; browser network activity is local-only and no API key is needed.
-- [ ] Confirm the session creates no SQLite/database file and does not write to `data/database/`, `data/images/`, `data/imports/`, `cache/`, or `notes/`.
+- [ ] Confirm the session creates no SQLite/database file, requests no microphone permission, and does not write to `data/database/`, `data/images/`, `data/audio/`, `data/imports/`, `cache/`, or `notes/`.
 
 ## Fixture and content gates
 
+- [ ] Sidebar routes render core UI for `Today Record`, `Dashboard`, `Plan`, `Review`, and `Settings`, with exactly one active route.
 - [ ] The Today Record page visibly and unambiguously says that its displayed data is a **synthetic fixture**.
+- [ ] Every other tab visibly identifies illustrative or synthetic fixture content and never presents it as user data.
 - [ ] All displayed records come from local fixtures; no fixture is presented as a real user record.
 - [ ] The fixture model supports and the UI shows the three expandable categories: `cardio`, `strength`, and `stretching/mobility`.
 - [ ] Any incomplete or uncertain fixture item is explicitly marked `needs_review`; the UI does not silently convert uncertainty into a confirmed fact.
 - [ ] Reloading the page does not turn fixture content into persisted business data.
+- [ ] Dashboard preserves missing/low-confidence states; Plan labels Calendar as preview-only; Review controls are inert; Settings labels all integrations and persistence as preview/gated.
+- [ ] Voice capture remains interface-only: no microphone permission request, audio creation, or transcription occurs in 0.1.
 
 ## Desktop visual review (1440 × 1000)
 

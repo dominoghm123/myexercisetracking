@@ -155,6 +155,7 @@ The MVP keeps **one regenerated daily record per day** as the canonical readable
 - Automated import of Xiaomi Health exports.
 - Phone capture client and computer sync protocol implementation.
 - Live wearable connections and passive background capture.
+- Microphone recording, local/external speech transcription, and voice-to-structured-field parsing. The interface is reserved post-0.1; original audio is immutable evidence and every transcript/parsed value requires user review.
 - Advanced coaching recommendations, adaptive goals, exercise programming, micronutrients, or predictive analytics.
 - Multi-person UI, permissions, or account management.
 - Scheduled 9:00 a.m. reminders; revisit only if manual routine adherence shows a real need.

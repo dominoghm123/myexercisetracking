@@ -6,9 +6,11 @@ node_modules/
 data/database/*
 data/images/*
 data/imports/*
+data/audio/*
 !data/database/.gitkeep
 !data/images/.gitkeep
 !data/imports/.gitkeep
+!data/audio/.gitkeep
 
 # Regenerable and local-only outputs
 cache/*

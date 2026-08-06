@@ -42,6 +42,7 @@ The local structured store and original images are authoritative. Obsidian Markd
 - Calendar → App reading, conflict reconciliation, automatic rescheduling, and background sync.
 - Xiaomi live/watch integration and LeKe APIs.
 - App-hosted cloud backend, public/social features, payments, accounts, mobile UI, and live wearable linkage.
+- Microphone recording and speech transcription. A deferred local-first voice-capture port is reserved for workout sets/load/repetitions, coaching cues, workout summaries, meal notes, and daily-health notes; transcripts remain `needs_review` until explicit confirmation.
 - Medical diagnosis or automatic health/nutrition prescriptions.
 
 ## 4. Technical decisions
@@ -169,4 +170,3 @@ The new implementation window should first reply with:
 - the first screenshot review checkpoint;
 - the exact user-data batch it needs next;
 - any conflict between the handover and the user's latest instruction.
-

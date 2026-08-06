@@ -105,7 +105,7 @@ export const renderTodayRecord = (viewModel = {}) => {
                 { key: 'meal', label: 'Add a meal' },
                 { key: 'health', label: 'Daily health' },
               ]).map((action, index) => `
-                <button class="today-capture-button${index === 0 ? ' today-capture-button--primary' : ''}" type="button" data-action="capture-${escapeHtml(action.key)}">
+                <button class="today-capture-button${index === 0 ? ' today-capture-button--primary' : ''}" type="button" data-action="capture-${escapeHtml(action.key)}"${action.voiceContext ? ` data-voice-context="${escapeHtml(action.voiceContext)}"` : ''}>
                   <span>${escapeHtml(action.label)}</span>
                   ${icon(index === 0 ? 'add' : 'arrow')}
                 </button>`).join('')}
@@ -174,4 +174,3 @@ export const renderTodayRecord = (viewModel = {}) => {
       </div>
     </main>`;
 };
-
