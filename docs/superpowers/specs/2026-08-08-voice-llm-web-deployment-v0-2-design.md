@@ -79,6 +79,7 @@ Deployment is a separate slice from local data storage:
 3. Add SQLite revisions/audit and explicit confirmation.
 4. Implement one provider adapter behind a feature flag after provider, region, privacy, and credential decisions are supplied.
 5. Choose and implement private web deployment, then add maintenance/rollback checks.
+6. After the web client is deployed and its contracts are stable, create an Android APK milestone using the same provider-neutral domain contracts and authenticated service boundary; mobile is a later client, not a second source of truth.
 
 ## Acceptance criteria for this design slice
 
@@ -87,3 +88,4 @@ Deployment is a separate slice from local data storage:
 - Validators reject malformed operations (unknown op, disallowed field path, missing target, invalid confidence/status, or duplicate idempotency key) and any attempt to mark a candidate confirmed before user confirmation.
 - Existing MVP 0.1 fixtures and protected data directories remain unchanged.
 - No API key, microphone permission, network call, or SQLite write is introduced.
+- The Android milestone remains future work until the web deployment acceptance checks pass.

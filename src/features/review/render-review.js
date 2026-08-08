@@ -30,6 +30,9 @@ export function renderReview(viewModel = {}) {
   }
 
   const fields = Array.isArray(viewModel.fields) ? viewModel.fields : [];
+  const candidate = viewModel.batchUpdateCandidate;
+  const candidateOperation = candidate?.operations?.[0];
+  const candidateField = candidateOperation?.fields?.[0];
 
   return `
     <main class="review-page" aria-labelledby="review-title">
@@ -46,6 +49,21 @@ export function renderReview(viewModel = {}) {
         <div><strong>${escapeHtml(viewModel.summary?.needsReview ?? 0)}</strong><span>Needs review</span></div>
         <div><strong>${escapeHtml(viewModel.summary?.confirmed ?? 0)}</strong><span>Confirmed</span></div>
         <p id="review-preview-note">Preview-only controls. No fixture status, file, or database record will be changed.</p>
+      </section>
+
+      <section class="review-batch-card" aria-labelledby="batch-candidate-title">
+        <div>
+          <span class="review-kicker">VOICE / MODEL CANDIDATE</span>
+          <h2 id="batch-candidate-title">Suggested batch update</h2>
+          <p>Fixture preview only. This proposal will remain outside SQLite until a future explicit confirmation flow exists.</p>
+        </div>
+        <dl class="review-batch-meta">
+          <div><dt>Operation</dt><dd>${escapeHtml(candidateOperation?.op || '—')}</dd></div>
+          <div><dt>Target</dt><dd>${escapeHtml(candidateOperation?.target?.date || '—')} · ${escapeHtml(candidateOperation?.target?.context || '—')}</dd></div>
+          <div><dt>Field</dt><dd>${escapeHtml(candidateField?.path || '—')}</dd></div>
+          <div><dt>Confidence</dt><dd>${Math.round((candidateField?.confidence || 0) * 100)}%</dd></div>
+        </dl>
+        <button class="review-confirm-all" type="button" aria-disabled="true" aria-describedby="review-preview-note">Preview candidate</button>
       </section>
 
       <section class="review-workbench" aria-label="Source comparison workbench">

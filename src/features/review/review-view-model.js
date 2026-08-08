@@ -1,3 +1,7 @@
+import { createBatchUpdateCandidate } from '../../contracts/batch-update-candidate.js';
+
+const batchUpdateCandidate = createBatchUpdateCandidate();
+
 export const reviewViewModel = Object.freeze({
   fixture: true,
   fixtureLabel: 'Synthetic fixture',
@@ -12,6 +16,7 @@ export const reviewViewModel = Object.freeze({
     needsReview: 3,
     confirmed: 1,
   },
+  batchUpdateCandidate,
   fields: [
     {
       id: 'meal-type',
