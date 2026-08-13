@@ -148,6 +148,8 @@ The initial fixture catalog contains representative cards across:
 
 The user will later provide the actual gym equipment list and preferred names. The app must support importing/replacing catalog configuration without changing historical record IDs.
 
+An `imageAssetId` must reference an `EvidenceAsset` whose category is `training` or `other`. The catalog stores the asset's license snapshot and attribution metadata; deleting or replacing a catalog image never deletes the underlying evidence asset or historical exercise name snapshots. A missing/retired image falls back to a placeholder while preserving the prior asset ID for audit.
+
 ### 6.4 Image policy
 
 Use user-provided gym photos first. Otherwise use a neutral placeholder or an image with a documented `imageLicense`. Do not scrape commercial images into the repository.
@@ -269,6 +271,8 @@ EvidenceAsset {
 
 Original files are immutable. Thumbnails, OCR, captions, translated text, and AI estimates are derived artifacts linked by `assetId`. `data/images/` holds originals; `cache/` holds disposable intermediates; `notes/` holds readable projections only.
 
+Fixture assets are stored only in fixture modules or a clearly separate fixture path. They must carry `fixture: true`, display a visible `Synthetic fixture` label, and are prohibited from entering authoritative SQLite records, real-data export packages, or user backup packages.
+
 ### 9.3 Privacy defaults
 
 - File selection or camera permission is requested only after an explicit user action.
@@ -289,6 +293,8 @@ Tuesday is shown as a shortcut in the calendar and Today Record. The user can re
 BodyCompositionRecord {
   recordId: UUID
   measuredAt: timestamp
+  measuredOn: date
+  timezone: IANA timezone
   weightKg: number | null
   bodyFatPercent: number | null
   bodyWaterKg: number | null
@@ -305,7 +311,7 @@ BodyCompositionRecord {
 }
 ```
 
-The schema is extensible for additional device-specific fields. Source report wording is preserved as context and is not treated as a medical diagnosis.
+`measuredAt` is normalized to the user's configured IANA timezone before deriving `measuredOn`; `measuredOn` is the day used by weekly reports and Tuesday shortcuts. Android imports must include the source timezone or an explicit unknown state. The schema is extensible for additional device-specific fields. Source report wording is preserved as context and is not treated as a medical diagnosis.
 
 ### 10.3 Future export path
 
@@ -342,7 +348,11 @@ ReportProvider.draft(confirmedSummary, locale) → ReportDraftCandidate
 
 DeepSeek is implemented later behind `LanguageProvider` and may also be used for text-only report drafting. A separate vision-capable provider may be used for meal/body/report images if DeepSeek's selected API path does not support image input.
 
-### 11.3 Candidate rules
+### 11.3 External-AI consent and lifecycle
+
+Every external call requires explicit per-action confirmation. The confirmation shows provider, model, purpose, language, source categories, file names, whether original bytes or derived text leave the device, and available region/retention information. The user can cancel before dispatch and revoke provider access; revocation stops future calls but cannot retroactively delete a provider-side copy, which must be stated clearly. Timeouts, quota errors, refusals, and revoked consent create typed failure states and preserve local evidence; they never create confirmed facts.
+
+### 11.4 Candidate rules
 
 Every AI result carries provider/model/version, source asset IDs, confidence, unknowns, conflicts, schema version, and idempotency key. It starts as `needs_review` and `authority: false`. Only explicit user confirmation creates or updates a confirmed SQLite fact.
 
@@ -388,6 +398,10 @@ ReportDraftCandidate {
   provider: string
   model: string
   sourceRevision: number
+  aggregationVersion: string
+  reportTemplateVersion: string
+  promptVersion: string | null
+  inputSnapshotHash: string
   sections: {
     recordedFacts: string[]
     observations: string[]
@@ -401,6 +415,10 @@ ReportDraftCandidate {
 ```
 
 Reports are drafts until the user reviews/saves them. They are derived projections and do not replace daily source records.
+
+### 12.4 Report draft persistence
+
+Draft and reviewed reports are derived records linked to a source revision and input snapshot hash. Saving a report creates a report-draft revision and audit entry in SQLite; it never promotes report text into a workout, meal, health, or body-composition fact. Markdown under `notes/` is a projection and `cache/` is disposable. Users can edit, regenerate, archive, or delete drafts without deleting source facts or original evidence. A draft becomes stale when its source hash, aggregation version, locale, template version, or prompt version no longer matches current inputs.
 
 ## 13. Review and confirmation model
 
@@ -456,6 +474,15 @@ Initial APK scope:
 - offline queue with retry and deduplication;
 - explicit sync status.
 
+Android data-handling requirements:
+
+- The offline queue is a local device queue of outbound candidates and evidence references, never the authoritative cross-device store.
+- Each queued item has an operation ID, source revision, schema version, retry count, next-attempt time, and terminal failure state.
+- Upload order is evidence first, candidate second, confirmation/revision last; failed media uploads remain pending and retryable.
+- Retries are idempotent by operation ID. Authentication expiry pauses the queue and requires explicit re-authentication.
+- Revision conflicts become review items; the client never silently overwrites a newer local or remote revision.
+- APK acceptance requires offline capture, process-restart recovery, airplane-mode queueing, authenticated retry, duplicate suppression, media failure recovery, and visible sync status.
+
 Live background capture, full device sync, and Le刻 direct integration remain separate future decisions.
 
 ## 17. Acceptance criteria for this specification
@@ -467,10 +494,13 @@ Before implementation begins, the approved specification must establish that:
 - strength records support per-set kilograms, optional repetitions, cues, and revisions;
 - the equipment catalog is extensible and image licensing is explicit;
 - meal, training, body-state, coaching, and body-composition images share one immutable evidence model;
+- fixture assets are visibly labelled and cannot enter authoritative data or real-data backups;
 - Tuesday body composition is a shortcut, not a hard date constraint;
 - Xiaomi data is an Android/future adapter, not a browser promise;
 - AI/DeepSeek outputs are provider-neutral, review-gated candidates or report drafts;
+- every external AI call has per-action consent, visible data scope, revocation, and typed failure handling;
 - reports are based on deterministic aggregates and expose data coverage/gaps;
+- report drafts carry reproducibility metadata and remain derived/non-authoritative after save;
 - all protected data boundaries remain intact;
 - web deployment precedes Android APK work;
 - no API key, microphone permission, external model call, real personal data write, or SQLite schema migration is introduced merely by approving this document.
